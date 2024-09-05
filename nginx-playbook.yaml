@@ -1,0 +1,30 @@
+---
+  - name: install nginx
+    hosts: all 
+    become: true 
+
+    vars:
+       package_name: nginx
+       service_name: nginx
+
+    tasks:
+       - name: install package
+         apt:
+            name: "{{ package_name }}"
+            state: present 
+
+       - name: ensure the service is running
+         service: 
+            name: "{{ service_name }}"
+            state: started
+
+       - name: display the hostname
+         debug:
+            msg: "the hostname is {{ ansible_hostname }}"
+
+       - name: disply the OS distribution
+         debug:
+            msg: "the OS distribution is {{ ansible_distribution }}"
+
+    
+     

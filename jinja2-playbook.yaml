@@ -1,0 +1,16 @@
+---
+   - name: jinja playbook
+     hosts: host01
+     become: true
+
+     vars: 
+       my_list: [1, 2, 3, 4, 5,]
+
+     tasks:
+       - name: sum of list
+         debug:
+           msg: "this is sum of list {{ my_list | sum }}"
+
+       - name: convert in upper 
+         debug: 
+           msg: "this is uppercase {{ 'harish' | upper }}"

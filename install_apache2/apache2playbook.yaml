@@ -1,0 +1,66 @@
+---
+- name: Install and configure Apache2
+  hosts: host01
+  become: true
+  vars_files:
+    - vars/var.yaml
+
+  tasks:
+    - name: Uninstall nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: absent
+        autoremove: yes
+
+    - name: Ensure apache2 is at the latest version
+      ansible.builtin.apt:
+        name: apache2
+        state: latest
+        update_cache: yes
+      notify: 
+        - Apache2 restart
+        - Enable Apache2
+
+    - name: Create directory for each domain
+      ansible.builtin.file:
+        dest: "/var/www/html/{{harish.name}}/"
+        state: directory
+        mode: '0755'
+      loop: "{{ domains }}"
+      loop_control:
+        loop_var: harish
+
+    - name: Write index file for each domain 
+      ansible.builtin.template:
+        src: template/index.html.j2
+        dest: "/var/www/html/{{harish.name}}/index.html"
+      loop: "{{ domains }}"
+      loop_control:
+        loop_var: harish
+      
+    - name: Write the Apache vhosts config file
+      ansible.builtin.template:
+        src: template/apache2.conf.j2
+        dest: "/etc/apache2/sites-available/apache2.conf"
+
+    - name: Enable the webserver site
+      command: a2ensite apache2.conf
+
+    - name: Disable the default site
+      command: a2dissite 000-default.conf
+
+    - name: Reload apache2
+      ansible.builtin.systemd:
+        name: apache2
+        state: reloaded
+  handlers:
+    - name: Apache2 restart
+      ansible.builtin.systemd:
+        name: apache2
+        state: restart
+
+    - name: Enable Apache2
+      ansible.builtin.systemd:
+        name: apache2
+        enabled: true
+

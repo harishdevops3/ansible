@@ -1,0 +1,14 @@
+{% for harish in domains %}
+<VirtualHost *:80>
+  ServerName www.{{harish.name}}.tld
+  DocumentRoot /var/www/html/{{harish.name}}/
+  ServerAdmin webmaster@{{harish.name}}.tld
+
+  <Directory "/var/www/html/{{harish.name}}/">
+    Options Indexes FollowSymLinks
+    AllowOverride All
+    Require all granted 
+  </Directory>
+  
+</VirtualHost>
+{% endfor %}
